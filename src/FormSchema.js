@@ -5,14 +5,28 @@ const FormSchema = Yup.object().shape({
         .string()
         .min(2, "name must be at least 2 characters long.")
         .required("first name is Required"),
-    instructionds: Yup
+    instructions: Yup
         .string()
-        .min(10, "name must be at least 10 characters long.")
+        .min(10, "instructions must be at least 10 characters long.")
         .required("instructions are Required"),
-
-    termsofservice: Yup
+    size: Yup
+        .string()
+        .required ("please select  a size"),
+    pepperoni:Yup
         .boolean()
-        .oneOf([true], "Please accept the TOS")
-        .required('Please select')
+        .oneOf([true], 'Must select a topping'),
+    // broccoli:Yup
+    //     .boolean()
+    //     .oneOf([true], 'Must select a topping'),
+    // Sausage:Yup
+    //     .boolean()
+    //     .oneOf([true], 'Must select a topping'),
+    // mushroom:Yup
+    //     .boolean()
+    //     .oneOf([true], 'Must selecte a topping'),
+    // pineapple:Yup
+    //     .boolean()
+    //     .oneOf([true], 'Must selecte a topping'),
+    
 })
 export default FormSchema;

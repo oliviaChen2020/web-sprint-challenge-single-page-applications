@@ -1,4 +1,4 @@
-import React, {useState}from "react"
+import React from "react"
 
 
 export default function Form(props){
@@ -7,6 +7,7 @@ export default function Form(props){
         onSubmit,
         onInputChange,
         onCheckboxChange,
+        disabled,
         errors,
     } = props
     return(
@@ -74,7 +75,7 @@ export default function Form(props){
                     <label>Mushroom
                     <input
                         type ="checkbox"
-                        name ="Mushroom"
+                        name ="mushroom"
                         onChange={onCheckboxChange}
                         checked ={values.mushroom}
                     />
@@ -97,7 +98,7 @@ export default function Form(props){
                 <div>{errors.mushroom}</div>
            
             <div className='submit'>
-                <button onClick={onSubmit}>submit</button>
+                <button disabled={disabled} onClick={onSubmit}>Order</button>
             </div>
             </div>
         </form>

@@ -1,14 +1,15 @@
-import React, { useState }from "react";
+import React, { useState, useEffect }from "react";
 import { Route, Link } from 'react-router-dom'
 import Home from "./Home"
 import Form from "./Form"
+import Order from"./Order"
 import * as Yup from "yup"
 import FormSchema from "./FormSchema"
+import axios from "axios"
 
 const initialFormValues = {
   name: '',
   instructions:'',
-  password: '',
   size: '',
   pepperoni: false,
   broccoli: false,
@@ -19,80 +20,59 @@ const initialFormValues = {
 
 const initialFormErrors = {
   name: '',
-  instructions:'',
-  password: '',
-  size: '',
-  pepperoni: false,
-  broccoli: false,
-  sausage: false,
-  mushroom: false,
-  pineapple: false,
+  instructions:''
 }
 
 const initialOrders = []
+
+const initialDisabled = true
 
 const App = () => {
   const [orders, setOrders] = useState(initialOrders)
   const [formValues, setFormValues] = useState(initialFormValues)
   const [formErrors, setFormErrors] = useState(initialFormErrors)
-
-const getNewOrder = ()=>{
-  setOrders(orders)
-}
-const postNewOrders =() =>{
-  setFormValues(formValues)
-}
-const onInputChange = evt => {
-  const name = evt.target.name
-  const value = evt.target.value
-    Yup
-      .reach(FormSchema, name)
-      .validate(value)
-      .then(valid => {
-        setFormErrors({
-          ...formErrors,
-          [name]: ""
-        });
+  const [disabled, setDisabled] = useState(initialDisabled)
+  
+  const postNewOrders =newOrder =>{
+    axios.post('https://reqres.in/api/users', newOrder)
+      .then (res =>{
+        setFormValues(initialFormValues)
+        setOrders([...orders, res.data])
       })
-      .catch(err => {
-        setFormErrors({
-          ...formErrors,
-          [name]: err.errors[0]
+      .catch (err =>{
+        console.log(err)
+      })
+  }
+  const onInputChange = evt => {
+    const name = evt.target.name
+    const value = evt.target.value
+      Yup
+        .reach(FormSchema, name)
+        .validate(value)
+        .then(valid => {
+          setFormErrors({
+            ...formErrors,
+            [name]: ""
+          });
+        })
+        .catch(err => {
+          setFormErrors({
+            ...formErrors,
+            [name]: err.errors[0]
+          });
         });
-      });
-
-    setFormValues({
-      ...formValues,
-      [name]: value
-    })
+      setFormValues({
+        ...formValues,
+        [name]: value
+      })
   }
 
   const onCheckboxChange = evt => {
     const name = evt.target.name
     const checked = evt.target.checked
-    console.log()
-    Yup
-      .reach(FormSchema, name)
-      .validate()
-      .then(valid => {
-        setFormErrors({
-          ...formErrors,
-          [name]: ''
-        });
-      })
-      .catch(err => {
-        setFormErrors({
-          ...formErrors,
-          [name]: err.errors[0]
-        });
-      });
     setFormValues({
       ...formValues,
-      pepperoni: checked,
-      broccoli: checked,
-      sausage: checked,
-      mushroom: checked,
-      pineapple: checked,
+      [name]: checked
     })
   }
 
@@ -100,12 +80,17 @@ const onInputChange = evt => {
     evt.preventDefault()
 
     const newOrder = {
+      ...formValues,
       name: formValues.name.trim(),
-      instructions: formValues.instructions.trim(),
-      
+      instructions: formValues.instructions.trim()
     }
     postNewOrders(newOrder)
   }
+  useEffect(() => {
+    FormSchema.isValid(formValues).then(valid => {
+      setDisabled(!valid);
+    })
+  }, [formValues])
   
   return (
     // <>
@@ -130,12 +115,17 @@ const onInputChange = evt => {
         values={formValues}
         onInputChange={onInputChange}
         onCheckboxChange={onCheckboxChange}
+        disabled={disabled}
         onSubmit={onSubmit}
-        errors={formErrors}/>
+        errors={formErrors}
+        />
     </Route>
-
-    
-  </div>
+      {
+        orders.map((order, index) => {
+          return <Order order={order} key={`${order}-${index}`} />
+        })
+      }
+    </div>
   );
 };
 export default App;
